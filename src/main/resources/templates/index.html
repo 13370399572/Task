@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org" >
+
+<head>
+
+<meta charset="UTF-8">
+<meta
+	content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"
+	name="viewport" />
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta content="telephone=no" name="format-detection" />
+
+<title>学生报名</title>
+
+<link rel="stylesheet" th:href="@{/css/style.css}" />
+<script src="http://code.jquery.com/jquery-1.8.0.min.js"></script>
+
+</head>
+
+<body>
+   
+	<div class="container">
+		<!-- <form id="contact" action="" method="post"> -->
+		<form id="contact">
+			<h3>学生报名</h3>
+			<h4>填写下列信息</h4>
+			<fieldset>
+			    <input  type="hidden" id="id" name="id"/>
+				<input placeholder="学生姓名" id="name" name="name" type="text" tabindex="1"
+					required autofocus>
+			</fieldset>
+			<fieldset>
+				<input placeholder="班级" id="banji"  name="banji" type="text" tabindex="2"
+					required>
+			</fieldset>
+			<fieldset>
+				<input placeholder="家长姓名" id="jiazhang" name="jiazhang" type="text" tabindex="3"
+					required>
+			</fieldset>
+			<fieldset>
+				<input placeholder="家长电话" id="phone"   name="phone" type="text" tabindex="4"
+					required>
+			</fieldset>
+			<fieldset>
+				<textarea placeholder="备注" id="remark"   name="remark" tabindex="5" required></textarea>
+			</fieldset>
+			<fieldset>
+				<div type="submit" style="text-align: center" id="contact-submit">点击提交</div>
+				<div type="submit" style="text-align: center" id="update-submit">点击修改</div>
+			</fieldset>
+		</form>
+
+	</div>
+	<div style="text-align: center; clear: both">
+		<script type="text/javascript">
+		var id = null;
+			$(function() {
+			var url = "/index/getId"
+			$.get(url,function(data){
+				id = data
+				if(id==null){
+					$("#contact-submit").show();
+					$("#update-submit").hide();
+					
+				}else{
+					$("#contact-submit").hide();
+					$("#update-submit").show();
+					url = "/banji/select/"+id;
+					$.post(url,function(data){
+						$("#id").val(id);
+						$("#name").val(data.name);
+						$("#banji").val(data.banji);
+						$("#jiazhang").val(data.jiazhang);
+						$("#phone").val(data.phone);
+						$("#remark").val(data.remark);
+					})
+				}
+			})
+			
+			})
+			$("#update-submit").click(function(){
+				var banji = JSON.stringify($("#contact").serializeObject());
+				$.ajax({
+					type : "POST",
+					url : "/banji/update",
+					contentType : "application/json",
+					data : banji,
+					success : function(data) {
+						alert("修改成功")
+						window.location.href="/index/paginfo";
+					}
+				})
+			})
+			
+			$("#contact-submit").click(function() {
+				debugger;
+				var banji = JSON.stringify($("#contact").serializeObject());
+				/*  var banji =	$("#contact").serializeObject() */
+				debugger;
+				$.ajax({
+					type : "POST",
+					url : "/banji/save",
+					contentType : "application/json",
+					data : banji,
+					success : function(data) {
+						alert("添加成功")
+					}
+				})
+			})
+
+			$.fn.serializeObject = function() {
+				var o = {};
+				var a = this.serializeArray();
+				$.each(a, function() {
+					if (o[this.name]) {
+						if (!o[this.name].push) {
+							o[this.name] = [ o[this.name] ];
+						}
+						o[this.name].push(this.value || '');
+					} else {
+						o[this.name] = this.value || '';
+					}
+				});
+				return o;
+			};
+		</script>
+	</div>
+</body>
+</html>

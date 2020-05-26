@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.redis.dao.TaskDao">
+	<insert id="save" parameterType="com.redis.entity.Task">
+		INSERT INTO task (name,cron,state,kind,method) VALUES
+		(#{param.name},#{param.cron},#{param.state}
+		,#{param.kind},#{param.method})
+	</insert>
+
+	<update id="update" parameterType="com.redis.entity.Task">
+		UPDATE task
+		<set>
+			<if test="param.name !=null">
+				name = #{param.name} ,
+			</if>
+			<if test="param.cron">
+				cron = #{param.cron},
+			</if>
+			<if test="param.state">
+				state = #{param.state},
+			</if>
+			<if test="param.kind">
+				kind = #{param.kind},
+			</if>
+			<if test="param.method">
+				method = #{param.method},
+			</if>
+            WHERE id= #{param.id};
+		</set>
+	</update>
+</mapper>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.redis.dao.UserDao">
+
+    <select id="queryAll" resultType="com.redis.entity.User">
+        select * from user
+    </select>
+
+    <select id="findUserById" resultType="com.redis.entity.User" parameterType="int">
+        select * from user where uid = #{id}
+    </select>
+
+    <update id="updateUser" parameterType="com.redis.entity.User">
+        update user 
+        <trim prefix="set" suffixOverrides=",">
+            <if test="user.userName != null and user.userName != '' ">
+                username = #{user.userName},
+            </if>
+            <if test="user.passWord != null and user.passWord != ''">
+                password = #{user.passWord},
+            </if>
+            <if test="user.salary != 0">
+                salary = #{user.salary}
+            </if>
+        </trim>
+        where uid = #{user.uid}
+    </update>
+
+    <delete id="deleteUserById" parameterType="int">
+        delete from user where uid = #{id}
+    </delete>
+
+</mapper>

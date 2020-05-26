@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta
+	content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"
+	name="viewport" />
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="black" name="apple-mobile-web-app-status-bar-style" />
+<meta content="telephone=no" name="format-detection" />
+<link rel="stylesheet"
+	href="/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="/DataTables-1.10.20/css/dataTables.bootstrap.css">
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript" rel="stylesheet"
+	src="/DataTables-1.10.20/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" rel="stylesheet"
+	src="/DataTables-1.10.20/js/dataTables.bootstrap.min.js"></script>
+<link rel="stylesheet"
+	href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+<!-- 引入YDUI样式 -->
+<!-- <link rel="stylesheet" href="path/build/css/ydui.css" /> -->
+<!-- 引入YDUI自适应解决方案类库 -->
+<!-- <script src="path/build/js/ydui.flexible.js"></script> -->
+<!-- 引入YDUI脚本 -->
+<!-- <script src="path/build/js/ydui.js"></script> -->
+<title>分页</title>
+
+
+</head>
+<body>
+	<!-- <div class="box-body">
+                <div  class="same">
+                    <input type="text" name="keyword" class="textSearch" 
+                        placeholder="搜索" />
+                    <button class="btn btn-primary">查询</button>
+                </div> -->
+
+            <div class="row">
+            <div class="form-inline" style="padding: 0px 0px 0px 150px">
+                <input type="text" name="name" id="name"  class="input-sm" placeholder="学生姓名" />
+                <button onclick="query()"  class="btn btn-primary">搜 索</button>
+            </div>
+ </div>
+	<table id="example2" class="table table-bordered table-hover">
+		<thead>
+			<tr role="row">
+				<th>id</th>
+				<th>学生姓名</th>
+				<th>家长姓名</th>
+				<th>家长电话</th>
+				<th>班级</th>
+				<th>备注</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody class="tdoby_student_data">
+
+		</tbody>
+		<tfoot>
+		</tfoot>
+	</table>
+	</div>
+	</div>
+</body>
+<script>
+    var table;
+    $(function () {
+    	tables()
+    });
+      
+        function query(){
+        	$("#example2").dataTable().fnDestroy();
+        	tables()
+        }
+    
+        function deleteThisRowPapser(id){
+        	url="/banji/delete/"+id
+        	$.post(url,function(data){
+        		alert(data)
+        		$('#example2').DataTable().ajax.reload();
+        		/* dttable = $('#example2').dataTable();
+                dttable.fnClearTable(); //清空一下table
+                dttable.fnDestroy(); */
+        	})
+        }
+        
+        function update(id){
+        	/* var url="/index/get"
+            var	params ={
+        			id:id
+        	} 
+        	$.get(url,params,function(data){
+        		
+        	}) */
+        	window.location.href="/index/get?id="+id;
+        }
+        
+        function tables(){
+     	   //提示信息
+         $.fn.dataTable.ext.errMode = 'none';
+         var lang = {
+             "sProcessing": "处理中...",
+             "sLengthMenu": "每页 _MENU_ 项",
+             "sZeroRecords": "没有匹配结果",
+             "sInfo": "当前显示第 _START_ 至 _END_ 项，共 _TOTAL_ 项。",
+             "sInfoEmpty": "当前显示第 0 至 0 项，共 0 项",
+             "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+             "sInfoPostFix": "",
+             "sSearch": "搜索:",
+             "sUrl": "",
+             "sEmptyTable": "表中数据为空",
+             "sLoadingRecords": "载入中...",
+             "sInfoThousands": ",",
+             "oPaginate": {
+                 "sFirst": "首页",
+                 "sPrevious": "上页",
+                 "sNext": "下页",
+                 "sLast": "末页",
+                 "sJump": "跳转"
+             },
+             "oAria": {
+                 "sSortAscending": ": 以升序排列此列",
+                 "sSortDescending": ": 以降序排列此列"
+             }
+         };
+         //初始化表格
+         table = $("#example2")
+             .on('error.dt', function (e, settings, techNote, message) {
+                 console.warn(message)
+             }).dataTable({
+                 language: lang, //提示信息
+                 autoWidth: false, //禁用自动调整列宽
+                 stripeClasses: ["odd", "even"], //为奇偶行加上样式，兼容不支持CSS伪类的场合
+                 processing: true, //隐藏加载提示,自行处理
+                 serverSide: false, //启用服务器端分页
+                 searching: false, //禁用原生搜索
+                 orderMulti: false, //启用多列排序
+                 order: [], //取消默认排序查询,否则复选框一列会出现小箭头
+                 renderer: "bootstrap", //渲染样式：Bootstrap和jquery-ui
+                 pagingType: "simple_numbers", //分页样式：simple,simple_numbers,full,full_numbers
+                 columnDefs: [{
+                     "targets": 'nosort', //列的样式名
+                     "orderable": false //包含上样式名‘nosort'的禁止排序
+                 }],
+                 ajax: function (data, callback, settings) {
+                     //封装请求参数
+                     var name = $("#name").val();
+                     
+                     var param = {};
+                     param.pageSize = data.length;//页面显示记录条数，在页面显示每页显示多少项的时候
+                     param.start = data.start;//开始的记录序号
+                     param.currentPage = (data.start / data.length) + 1;//当前页码
+                     param.name=name
+                    debugger;
+                     //console.log(param);
+                     //ajax请求数据
+                     $.ajax({
+                         type: "GET",
+                         url: "/banji/myStudentList",
+                         cache: false, //禁用缓存
+                         data: param, //传入组装的参数
+                         dataType: "json",
+                         success: function (result) {
+                             var returnData = {};
+                             returnData.draw = data.startRow;//这里直接自行返回了draw计数器,应该由后台返回
+                             returnData.recordsTotal = result.totalRows;//返回数据全部记录
+                             returnData.recordsFiltered = result.totalRows;//后台不实现过滤功能，每次查询均视作全部结果
+                             returnData.data = result.items;//返回的数据列表
+                             //此时的数据需确保正确无误，异常判断应在执行此回调前自行处理完毕
+                             callback(returnData);
+                         }
+                     });
+                 },
+                 
+                 "columns": [   
+                     //跟你要显示的字段是一一对应的。我这里只显示八列
+                     {'data': 'id'},
+                     {'data': 'name'},
+                     {'data': 'jiazhang'},
+                     {'data': 'phone'},
+                     {'data': 'banji'},
+                     {'data': 'remark'},
+                     {
+                         "data": "谨慎操作",
+                          render: function (data, type, row) {
+                         	 var id = '"' + row.id + '"';
+                         	var html = "<a href='javascript:void(0);'  onclick='update("+ id + ")'  class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'   > </i> 编辑</a>"
+                         	 html += "<a href='javascript:void(0);'   onclick='deleteThisRowPapser("+ id + ")'  class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i> 删除</a>"
+                         	 return html;
+                         	
+                         }
+                     },
+                 ],
+                 "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull)            {                    //列样式处理
+                 }
+             })
+             .api();
+         //此处需调用api()方法,否则返回的是JQuery对象而不是DataTables的API对象
+       $('#example2_length').hide();
+     }
+ 
+</script>
+</html>
